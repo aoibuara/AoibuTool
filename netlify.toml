@@ -1,0 +1,15 @@
+[build]
+  publish = "."
+
+# هذا الجزء يمنع ظهور صفحة 404 ويعيد التوجيه للصفحة الرئيسية دائماً
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# هذا الجزء ضروري جداً لكي تعمل أداة تحويل الفيديو والصوت
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"
