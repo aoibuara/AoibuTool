@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aoibu Tools | أدوات أويبو الاحترافية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 40px 0 rgba(99, 102, 241, 0.2);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent), var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <nav class="glass-card sticky top-0 z-50 rounded-b-2xl mx-2 mt-2 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+                <i class="fa-solid fa-layer-group text-white text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-black tracking-wide">Aoibu <span class="text-gradient">Tools</span></h1>
+        </div>
+        <div class="text-xs text-gray-400 bg-white/5 px-3 py-1 rounded-full">
+            <i class="fa-solid fa-bolt text-yellow-400 mr-1"></i> يعمل محلياً في المتصفح
+        </div>
+    </nav>
+
+    <header class="container mx-auto px-4 py-16 text-center">
+        <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+            حول، اضغط، وعدّل ملفاتك <br>
+            <span class="text-gradient">بسرعة البرق وتصميم خيالي</span>
+        </h2>
+        <p class="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+            منصة Aoibu تعمل بتقنيات WebAssembly و WebTorrent. ملفاتك لا تغادر جهازك أبداً، المعالجة تتم داخل متصفحك.
+        </p>
+    </header>
+
+    <main id="tools-grid" class="container mx-auto px-4 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div onclick="openTool('torrent')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden">
+                <div class="absolute top-2 left-2 bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full font-bold">WebRTC</div>
+                <div class="mb-4 w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-magnet"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">تورنت ويب</h3>
+                <p class="text-sm text-gray-400">تشغيل وتنزيل ملفات التورنت والروابط المغناطيسية مباشرة.</p>
+            </div>
+
+            <div onclick="openTool('video')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden ring-1 ring-red-500/30">
+                <div class="absolute top-2 left-2 bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded-full font-bold">FFmpeg</div>
+                <div class="mb-4 w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-clapperboard"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">تحويل فيديو</h3>
+                <p class="text-sm text-gray-400">MP4 ↔ WEBM ↔ MKV. تحويل حقيقي باستخدام WebAssembly.</p>
+            </div>
+
+            <div onclick="openTool('audio')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden">
+                <div class="mb-4 w-14 h-14 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-music"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">تحويل صوت</h3>
+                <p class="text-sm text-gray-400">حوّل ملفاتك الصوتية إلى MP3, WAV بكل سهولة.</p>
+            </div>
+
+            <div onclick="openTool('image')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden">
+                <div class="mb-4 w-14 h-14 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">محول الصور</h3>
+                <p class="text-sm text-gray-400">PNG ↔ JPG ↔ WEBP. تغيير الصيغ محلياً في المتصفح.</p>
+            </div>
+
+            <div onclick="openTool('extract')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden">
+                <div class="mb-4 w-14 h-14 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-wave-square"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">فصل الصوت</h3>
+                <p class="text-sm text-gray-400">استخراج الصوت (MP3) من أي مقطع فيديو.</p>
+            </div>
+            
+            <div onclick="openTool('qr')" class="glass-card p-6 rounded-2xl cursor-pointer group relative overflow-hidden">
+                <div class="mb-4 w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white text-2xl group-hover:scale-110 transition duration-300">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">صانع QR Code</h3>
+                <p class="text-sm text-gray-400">حول أي رابط أو نص إلى باركود قابل للمسح فوراً.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="workspace" class="fixed inset-0 bg-bg-dark/95 backdrop-blur-xl z-[100] hidden flex-col transition-opacity duration-300">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center border-b border-white/10">
+            <h2 id="workspace-title" class="text-2xl font-bold flex items-center gap-3"></h2>
+            <button onclick="closeWorkspace()" class="w-10 h-10 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 flex items-center justify-center">
+            <div class="w-full max-w-4xl glass-card rounded-2xl p-6 md:p-10 relative min-h-[400px] flex flex-col justify-center">
+                
+                <div id="tool-image" class="hidden tool-section w-full">
+                    <div class="border-2 border-dashed border-gray-600 hover:border-blue-500 rounded-xl p-10 text-center transition bg-black/20" id="img-drop-zone">
+                        <i class="fa-solid fa-image text-5xl text-gray-500 mb-4"></i>
+                        <p class="mb-4 text-lg">اختر صورة للتحويل</p>
+                        <input type="file" id="img-input" accept="image/*" class="hidden" onchange="handleImageSelect(this)">
+                        <button onclick="document.getElementById('img-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold">تصفح الملفات</button>
+                    </div>
+                    <div id="img-controls" class="hidden mt-6 text-center">
+                        <select id="img-format" class="bg-gray-800 border border-gray-600 rounded px-3 py-2 mb-4">
+                            <option value="image/png">PNG</option>
+                            <option value="image/jpeg">JPG</option>
+                            <option value="image/webp">WEBP</option>
+                        </select>
+                        <button onclick="convertImage()" class="bg-green-600 px-6 py-2 rounded-lg font-bold">تحويل</button>
+                        <div id="img-result" class="hidden mt-4">
+                            <a id="img-download" class="text-blue-400 underline cursor-pointer font-bold text-xl">تحميل الصورة الناتجة</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tool-qr" class="hidden tool-section w-full text-center">
+                    <input type="text" id="qr-input" placeholder="اكتب الرابط أو النص هنا..." class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white mb-4">
+                    <button onclick="generateQR()" class="w-full bg-white text-black py-3 rounded-lg font-bold mb-6 hover:bg-gray-200">إنشاء الباركود</button>
+                    <div id="qrcode" class="flex justify-center bg-white p-4 rounded-xl w-fit mx-auto hidden"></div>
+                </div>
+
+                <div id="tool-torrent" class="hidden tool-section w-full">
+                    <div class="text-center mb-6">
+                        <input type="text" id="torrent-input" placeholder="الصق رابط Magnet Link هنا..." class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white mb-4">
+                        <button onclick="startTorrent()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold w-full md:w-auto">
+                            <i class="fa-solid fa-download mr-2"></i> بدء التحميل
+                        </button>
+                    </div>
+                    <div id="torrent-status" class="hidden text-center bg-black/30 p-4 rounded-lg">
+                        <p id="torrent-info" class="text-accent mb-2">جاري البحث عن Peers...</p>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2">
+                            <div id="torrent-bar" class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div id="torrent-files" class="mt-4 text-right text-sm text-gray-300"></div>
+                    </div>
+                </div>
+
+                <div id="tool-ffmpeg" class="hidden tool-section w-full text-center">
+                    <div id="ffmpeg-loader" class="hidden mb-4">
+                        <span class="loader mb-2"></span>
+                        <p class="text-sm text-gray-400">جاري تحميل نواة المعالجة (ffmpeg-core)... يرجى الانتظار</p>
+                    </div>
+
+                    <div id="ffmpeg-ui">
+                        <div class="border-2 border-dashed border-gray-600 hover:border-red-500 rounded-xl p-8 transition bg-black/20 cursor-pointer" onclick="document.getElementById('ffmpeg-file').click()">
+                            <i class="fa-solid fa-file-video text-4xl text-gray-500 mb-3"></i>
+                            <p id="ffmpeg-filename" class="text-lg">اضغط لاختيار ملف وسائط</p>
+                            <input type="file" id="ffmpeg-file" class="hidden" onchange="handleFFmpegFile(this)">
+                        </div>
+
+                        <div id="ffmpeg-options" class="hidden mt-6 p-4 bg-white/5 rounded-xl">
+                            <label class="block text-right mb-2 text-sm text-gray-400">تحويل إلى:</label>
+                            <div class="flex gap-2 justify-center mb-6">
+                                <select id="ffmpeg-format" class="bg-gray-900 border border-gray-700 rounded p-2 flex-1 text-white">
+                                    </select>
+                                <button onclick="runFFmpeg()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold whitespace-nowrap">
+                                    بدء المعالجة
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="ffmpeg-progress-container" class="hidden mt-6">
+                            <p class="text-left text-xs text-gray-400 mb-1">سجل العمليات:</p>
+                            <div id="ffmpeg-logs" class="bg-black/50 p-3 rounded text-left text-xs font-mono h-24 overflow-y-auto text-green-400 mb-2"></div>
+                            <p id="ffmpeg-status-text" class="text-white font-bold animate-pulse">جاري المعالجة...</p>
+                        </div>
+
+                        <a id="ffmpeg-download" class="hidden mt-6 inline-block bg-white text-black px-8 py-3 rounded-lg font-bold hover:scale-105 transition">
+                            <i class="fa-solid fa-download mr-2"></i> تحميل الملف الناتج
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- تهيئة المتغيرات العامة ---
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        let ffmpeg = null;
+        let currentToolType = '';
+        let torrentClient = null;
+
+        // --- إدارة التنقل ---
+        function openTool(tool) {
+            document.getElementById('workspace').classList.remove('hidden');
+            document.getElementById('workspace').classList.add('flex');
+            
+            // إخفاء كل الأقسام
+            document.querySelectorAll('.tool-section').forEach(el => el.classList.add('hidden'));
+
+            const titles = {
+                'image': 'محول الصور',
+                'qr': 'مولد QR Code',
+                'torrent': 'تورنت ويب (WebTorrent)',
+                'video': 'تحويل فيديو (FFmpeg)',
+                'audio': 'تحويل صوت (FFmpeg)',
+                'extract': 'فصل الصوت (FFmpeg)'
+            };
+
+            document.getElementById('workspace-title').innerText = titles[tool];
+            currentToolType = tool;
+
+            if (tool === 'image') {
+                document.getElementById('tool-image').classList.remove('hidden');
+            } else if (tool === 'qr') {
+                document.getElementById('tool-qr').classList.remove('hidden');
+            } else if (tool === 'torrent') {
+                document.getElementById('tool-torrent').classList.remove('hidden');
+            } else {
+                // أدوات FFmpeg (فيديو، صوت، استخراج)
+                setupFFmpegUI(tool);
+            }
+        }
+
+        function closeWorkspace() {
+            document.getElementById('workspace').classList.add('hidden');
+            document.getElementById('workspace').classList.remove('flex');
+            
+            // تنظيف التورنت
+            if (torrentClient) {
+                torrentClient.destroy();
+                torrentClient = null;
+            }
+            
+            // إعادة تعيين الواجهات
+            resetUI();
+        }
+
+        function resetUI() {
+            document.getElementById('img-result').classList.add('hidden');
+            document.getElementById('qrcode').classList.add('hidden');
+            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('ffmpeg-download').classList.add('hidden');
+            document.getElementById('ffmpeg-progress-container').classList.add('hidden');
+            document.getElementById('torrent-status').classList.add('hidden');
+            document.getElementById('torrent-files').innerHTML = '';
+            document.getElementById('ffmpeg-options').classList.add('hidden');
+            document.getElementById('ffmpeg-filename').innerText = "اضغط لاختيار ملف وسائط";
+        }
+
+        // --- 1. منطق الصور ---
+        function handleImageSelect(input) {
+            if(input.files[0]) {
+                document.getElementById('img-controls').classList.remove('hidden');
+            }
+        }
+
+        function convertImage() {
+            const file = document.getElementById('img-input').files[0];
+            const format = document.getElementById('img-format').value;
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const dataUrl = canvas.toDataURL(format);
+                    
+                    const link = document.getElementById('img-download');
+                    link.href = dataUrl;
+                    let ext = format.split('/')[1];
+                    link.download = `converted.${ext}`;
+                    document.getElementById('img-result').classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- 2. منطق QR ---
+        function generateQR() {
+            const text = document.getElementById('qr-input').value;
+            if(!text) return;
+            const container = document.getElementById('qrcode');
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: text,
+                width: 150,
+                height: 150
+            });
+            container.classList.remove('hidden');
+        }
+
+        // --- 3. منطق التورنت (WebTorrent) ---
+        function startTorrent() {
+            const magnet = document.getElementById('torrent-input').value;
+            if(!magnet) return alert("الرجاء إدخال رابط Magnet");
+
+            document.getElementById('torrent-status').classList.remove('hidden');
+            
+            if (!torrentClient) torrentClient = new WebTorrent();
+
+            torrentClient.add(magnet, function (torrent) {
+                document.getElementById('torrent-info').innerText = `تم الاتصال! اسم الملف: ${torrent.name}`;
+                
+                // تحديث التقدم
+                torrent.on('download', function (bytes) {
+                    const progress = (torrent.progress * 100).toFixed(1);
+                    document.getElementById('torrent-bar').style.width = progress + '%';
+                    document.getElementById('torrent-info').innerText = `جاري التحميل... ${progress}% (${(torrent.downloadSpeed / 1024 / 1024).toFixed(2)} MB/s)`;
+                });
+
+                // عرض الملفات
+                const fileList = document.getElementById('torrent-files');
+                fileList.innerHTML = '';
+                torrent.files.forEach(function (file) {
+                    file.getBlobURL(function (err, url) {
+                        if (err) return;
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.textContent = `💾 ${file.name} (${(file.length / 1024 / 1024).toFixed(2)} MB) - اضغط للتحميل`;
+                        a.download = file.name;
+                        a.className = "block bg-white/10 p-2 rounded mb-2 hover:bg-white/20 transition";
+                        fileList.appendChild(a);
+                    });
+                });
+            });
+        }
+
+        // --- 4. منطق FFmpeg (فيديو/صوت) ---
+        let ffmpegFile = null;
+
+        async function loadFFmpeg() {
+            if (ffmpeg === null) {
+                document.getElementById('ffmpeg-loader').classList.remove('hidden');
+                document.getElementById('ffmpeg-ui').classList.add('opacity-50', 'pointer-events-none');
+                
+                ffmpeg = createFFmpeg({ 
+                    log: true,
+                    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+                });
+                
+                try {
+                    await ffmpeg.load();
+                    document.getElementById('ffmpeg-loader').classList.add('hidden');
+                    document.getElementById('ffmpeg-ui').classList.remove('opacity-50', 'pointer-events-none');
+                } catch (e) {
+                    alert("عذراً، متصفحك لا يدعم SharedArrayBuffer المطلوب للمعالجة. يرجى استخدام Chrome على سطح المكتب.");
+                    console.error(e);
+                }
+            }
+        }
+
+        function setupFFmpegUI(tool) {
+            document.getElementById('tool-ffmpeg').classList.remove('hidden');
+            const select = document.getElementById('ffmpeg-format');
+            select.innerHTML = '';
+            
+            // تحميل المكتبة إذا لم تكن محملة
+            loadFFmpeg();
+
+            if (tool === 'video') {
+                select.innerHTML = '<option value="mp4">MP4 (قياسي)</option><option value="webm">WebM (ويب)</option>';
+            } else if (tool === 'audio') {
+                select.innerHTML = '<option value="mp3">MP3</option><option value="wav">WAV</option>';
+            } else if (tool === 'extract') {
+                select.innerHTML = '<option value="mp3">استخراج الصوت (MP3)</option>';
+            }
+        }
+
+        function handleFFmpegFile(input) {
+            if(input.files[0]) {
+                ffmpegFile = input.files[0];
+                document.getElementById('ffmpeg-filename').innerText = ffmpegFile.name;
+                document.getElementById('ffmpeg-options').classList.remove('hidden');
+            }
+        }
+
+        async function runFFmpeg() {
+            if (!ffmpegFile || !ffmpeg) return;
+
+            const format = document.getElementById('ffmpeg-format').value;
+            const logDiv = document.getElementById('ffmpeg-logs');
+            const progressContainer = document.getElementById('ffmpeg-progress-container');
+            
+            progressContainer.classList.remove('hidden');
+            logDiv.innerHTML = 'بدء العملية...\n';
+
+            // ربط السجلات
+            ffmpeg.setLogger(({ message }) => {
+                logDiv.innerHTML += message + '\n';
+                logDiv.scrollTop = logDiv.scrollHeight;
+            });
+
+            const fileName = 'input_file';
+            ffmpeg.FS('writeFile', fileName, await fetchFile(ffmpegFile));
+
+            let command = [];
+            let outputName = `output.${format}`;
+
+            // إعداد الأوامر حسب النوع
+            if (currentToolType === 'video') {
+                command = ['-i', fileName, outputName];
+            } else if (currentToolType === 'audio') {
+                command = ['-i', fileName, outputName];
+            } else if (currentToolType === 'extract') {
+                command = ['-i', fileName, '-vn', '-ab', '192k', 'output.mp3'];
+                outputName = 'output.mp3';
+            }
+
+            try {
+                await ffmpeg.run(...command);
+                
+                const data = ffmpeg.FS('readFile', outputName);
+                const url = URL.createObjectURL(new Blob([data.buffer], { type: `video/${format}` })); // نوع تقريبي
+                
+                const dlBtn = document.getElementById('ffmpeg-download');
+                dlBtn.href = url;
+                dlBtn.download = outputName;
+                dlBtn.classList.remove('hidden');
+                
+                document.getElementById('ffmpeg-status-text').innerText = "تمت العملية بنجاح!";
+                document.getElementById('ffmpeg-status-text').classList.remove('animate-pulse');
+                document.getElementById('ffmpeg-status-text').classList.add('text-green-500');
+
+                // تنظيف الذاكرة
+                ffmpeg.FS('unlink', fileName);
+                ffmpeg.FS('unlink', outputName);
+            } catch (error) {
+                console.error(error);
+                logDiv.innerHTML += "\n[خطأ] حدثت مشكلة أثناء التحويل.";
+                alert("حدث خطأ. تأكد من إعدادات Netlify Headers.");
+            }
+        }
+    </script>
+</body>
+</html>
